@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Text,
   View,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Image,
 } from 'react-native';
 import { Glitter } from 'react-native-glitter';
 
@@ -13,7 +12,10 @@ export default function App() {
   const [active, setActive] = useState(true);
 
   return (
-    <ScrollView style={styles.scrollView} contentContainerStyle={styles.container}>
+    <ScrollView
+      style={styles.scrollView}
+      contentContainerStyle={styles.container}
+    >
       <Text style={styles.title}>React Native Glitter</Text>
       <Text style={styles.subtitle}>✨ Shimmer Effect Examples</Text>
 
@@ -67,13 +69,13 @@ export default function App() {
       <Text style={styles.sectionTitle}>Custom Colors</Text>
       <View style={styles.colorRow}>
         <Glitter active={active} color="rgba(255, 100, 100, 0.5)">
-          <View style={[styles.colorBox, { backgroundColor: '#ff6b6b' }]} />
+          <View style={[styles.colorBox, styles.colorBoxRed]} />
         </Glitter>
         <Glitter active={active} color="rgba(100, 255, 100, 0.5)">
-          <View style={[styles.colorBox, { backgroundColor: '#51cf66' }]} />
+          <View style={[styles.colorBox, styles.colorBoxGreen]} />
         </Glitter>
         <Glitter active={active} color="rgba(100, 100, 255, 0.5)">
-          <View style={[styles.colorBox, { backgroundColor: '#339af0' }]} />
+          <View style={[styles.colorBox, styles.colorBoxBlue]} />
         </Glitter>
       </View>
 
@@ -241,6 +243,15 @@ const styles = StyleSheet.create({
     width: 100,
     height: 80,
     borderRadius: 12,
+  },
+  colorBoxRed: {
+    backgroundColor: '#ff6b6b',
+  },
+  colorBoxGreen: {
+    backgroundColor: '#51cf66',
+  },
+  colorBoxBlue: {
+    backgroundColor: '#339af0',
   },
   speedRow: {
     flexDirection: 'row',

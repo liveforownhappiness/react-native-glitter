@@ -1,4 +1,11 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import {
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  type ReactNode,
+  type ReactElement,
+} from 'react';
 import {
   View,
   Animated,
@@ -10,7 +17,7 @@ import {
 
 export interface GlitterProps {
   /** The content to apply the glitter effect to */
-  children: React.ReactNode;
+  children: ReactNode;
   /** Duration of one shimmer animation cycle in milliseconds (default: 1500) */
   duration?: number;
   /** Delay between animation cycles in milliseconds (default: 500) */
@@ -52,17 +59,13 @@ export function Glitter({
   active = true,
   style,
   easing,
-}: GlitterProps): React.ReactElement {
+}: GlitterProps): ReactElement {
   const animatedValue = useRef(new Animated.Value(0)).current;
   const [containerWidth, setContainerWidth] = useState(0);
-  const animationRef = useRef<Animated.CompositeAnimation | null>(null);
+  const animationRef = useRef<ReturnType<typeof Animated.loop> | null>(null);
 
   const startAnimation = useCallback(() => {
     if (!active || containerWidth === 0) return;
-
-    // Calculate total distance including the extra width from rotation
-    const extraWidth = Math.tan((angle * Math.PI) / 180) * 200; // approximate extra width
-    const totalDistance = containerWidth + shimmerWidth * 2 + extraWidth;
 
     animatedValue.setValue(0);
 
@@ -74,10 +77,7 @@ export function Glitter({
     });
 
     animationRef.current = Animated.loop(
-      Animated.sequence([
-        timing,
-        Animated.delay(delay),
-      ])
+      Animated.sequence([timing, Animated.delay(delay)])
     );
 
     animationRef.current.start();
@@ -85,7 +85,7 @@ export function Glitter({
     return () => {
       animationRef.current?.stop();
     };
-  }, [active, containerWidth, duration, delay, angle, shimmerWidth, animatedValue, easing]);
+  }, [active, containerWidth, duration, delay, animatedValue, easing]);
 
   useEffect(() => {
     const cleanup = startAnimation();
@@ -97,9 +97,8 @@ export function Glitter({
     setContainerWidth(width);
   }, []);
 
-  // Calculate the total travel distance
+  // Calculate the shimmer travel distance
   const extraWidth = Math.tan((angle * Math.PI) / 180) * 200;
-  const totalDistance = containerWidth + shimmerWidth * 2 + extraWidth;
 
   const translateX = animatedValue.interpolate({
     inputRange: [0, 1],

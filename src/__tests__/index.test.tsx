@@ -1,4 +1,3 @@
-import React from 'react';
 import { Text, View } from 'react-native';
 import { Glitter } from '../index';
 
@@ -9,7 +8,7 @@ jest.mock('react-native', () => {
     start: jest.fn(),
     stop: jest.fn(),
   });
-  RN.Animated.loop = (animation: unknown) => ({
+  RN.Animated.loop = (_animation: unknown) => ({
     start: jest.fn(),
     stop: jest.fn(),
   });

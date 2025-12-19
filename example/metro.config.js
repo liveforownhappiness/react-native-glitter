@@ -1,8 +1,8 @@
 const path = require('path');
 const { getDefaultConfig } = require('@expo/metro-config');
-const { withMetroConfig } = require('react-native-monorepo-config');
 
 const root = path.resolve(__dirname, '..');
+const projectRoot = __dirname;
 
 /**
  * Metro configuration
@@ -10,10 +10,30 @@ const root = path.resolve(__dirname, '..');
  *
  * @type {import('metro-config').MetroConfig}
  */
-const config = withMetroConfig(getDefaultConfig(__dirname), {
-  root,
-  dirname: __dirname,
-});
+const config = getDefaultConfig(projectRoot);
+
+// Watch the root directory for changes
+config.watchFolders = [root];
+
+// Resolve react-native-glitter to the src folder
+config.resolver.extraNodeModules = {
+  'react-native-glitter': path.resolve(root, 'src'),
+  // Force React and React Native to use the example's versions
+  'react': path.resolve(projectRoot, 'node_modules/react'),
+  'react-native': path.resolve(projectRoot, 'node_modules/react-native'),
+};
+
+// Block duplicate React packages from root
+config.resolver.blockList = [
+  new RegExp(`^${path.resolve(root, 'node_modules/react')}/.*$`),
+  new RegExp(`^${path.resolve(root, 'node_modules/react-native')}/.*$`),
+];
+
+// Allow importing from the parent directory
+config.resolver.nodeModulesPaths = [
+  path.resolve(projectRoot, 'node_modules'),
+  path.resolve(root, 'node_modules'),
+];
 
 config.resolver.unstable_enablePackageExports = true;
 
