@@ -33,6 +33,9 @@
   ],
   "scripts": {
     "example": "yarn workspace react-native-glitter-example",
+    "example:ios": "yarn workspace react-native-glitter-example ios",
+    "example:android": "yarn workspace react-native-glitter-example android",
+    "example:web": "yarn workspace react-native-glitter-example web",
     "clean": "del-cli lib",
     "prepare": "bob build",
     "typecheck": "tsc",
