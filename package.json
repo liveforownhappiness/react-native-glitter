@@ -33,6 +33,7 @@
   ],
   "scripts": {
     "example": "yarn workspace react-native-glitter-example",
+    "ios": "yarn workspace react-native-glitter-example ios",
     "example:ios": "yarn workspace react-native-glitter-example ios",
     "example:android": "yarn workspace react-native-glitter-example android",
     "example:web": "yarn workspace react-native-glitter-example web",

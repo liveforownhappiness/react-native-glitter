@@ -10,6 +10,7 @@ import {
   View,
   Animated,
   StyleSheet,
+  Easing,
   type LayoutChangeEvent,
   type ViewStyle,
   type StyleProp,
@@ -20,9 +21,9 @@ export interface GlitterProps {
   children: ReactNode;
   /** Duration of one shimmer animation cycle in milliseconds (default: 1500) */
   duration?: number;
-  /** Delay between animation cycles in milliseconds (default: 500) */
+  /** Delay between animation cycles in milliseconds (default: 400) */
   delay?: number;
-  /** Color of the shimmer effect (default: 'rgba(255, 255, 255, 0.4)') */
+  /** Color of the shimmer effect (default: 'rgba(255, 255, 255, 0.8)') */
   color?: string;
   /** Angle of the shimmer in degrees (default: 20) */
   angle?: number;
@@ -34,6 +35,43 @@ export interface GlitterProps {
   style?: StyleProp<ViewStyle>;
   /** Easing function for the animation */
   easing?: (value: number) => number;
+}
+
+/**
+ * Generate opacities with a sharp bright center and soft wide falloff.
+ * Creates a "glitter" effect where the center is thin and bright,
+ * while the edges fade out softly over a wider area.
+ * @param count - Number of layers
+ * @param peak - Maximum opacity at center
+ */
+function generateGlitterOpacities(count: number, peak: number = 1): number[] {
+  const opacities: number[] = [];
+  const center = (count - 1) / 2;
+
+  for (let i = 0; i < count; i++) {
+    const distance = Math.abs(i - center);
+    const normalizedDistance = distance / center; // 0 at center, 1 at edges
+
+    // Sharp peak at center, soft falloff at edges
+    // Uses a combination of steep exponential for center and gentle curve for edges
+    let opacity: number;
+    if (normalizedDistance < 0.15) {
+      // Very bright, thin center (only ~15% of width)
+      opacity = peak;
+    } else if (normalizedDistance < 0.3) {
+      // Quick falloff from bright center
+      const t = (normalizedDistance - 0.15) / 0.15;
+      opacity = peak * (1 - t * 0.6); // Drop to 40% of peak
+    } else {
+      // Soft, wide glow (remaining 70% of width)
+      const t = (normalizedDistance - 0.3) / 0.7;
+      opacity = peak * 0.4 * Math.pow(1 - t, 2); // Quadratic falloff from 40% to 0
+    }
+
+    opacities.push(Math.max(0, opacity));
+  }
+
+  return opacities;
 }
 
 /**
@@ -52,8 +90,8 @@ export interface GlitterProps {
 export function Glitter({
   children,
   duration = 1500,
-  delay = 500,
-  color = 'rgba(255, 255, 255, 0.4)',
+  delay = 400,
+  color = 'rgba(255, 255, 255, 0.8)',
   angle = 20,
   shimmerWidth = 60,
   active = true,
@@ -64,6 +102,9 @@ export function Glitter({
   const [containerWidth, setContainerWidth] = useState(0);
   const animationRef = useRef<ReturnType<typeof Animated.loop> | null>(null);
 
+  // Default easing: smooth ease-in-out for natural movement
+  const defaultEasing = Easing.bezier(0.4, 0, 0.2, 1);
+
   const startAnimation = useCallback(() => {
     if (!active || containerWidth === 0) return;
 
@@ -73,7 +114,7 @@ export function Glitter({
       toValue: 1,
       duration,
       useNativeDriver: true,
-      easing,
+      easing: easing ?? defaultEasing,
     });
 
     animationRef.current = Animated.loop(
@@ -85,7 +126,15 @@ export function Glitter({
     return () => {
       animationRef.current?.stop();
     };
-  }, [active, containerWidth, duration, delay, animatedValue, easing]);
+  }, [
+    active,
+    containerWidth,
+    duration,
+    delay,
+    animatedValue,
+    easing,
+    defaultEasing,
+  ]);
 
   useEffect(() => {
     const cleanup = startAnimation();
@@ -105,14 +154,15 @@ export function Glitter({
     outputRange: [-shimmerWidth - extraWidth, containerWidth + shimmerWidth],
   });
 
-  // Create gradient-like effect using multiple views with varying opacity
-  const shimmerLayers = [
-    { opacity: 0.1, offset: -shimmerWidth * 0.4 },
-    { opacity: 0.2, offset: -shimmerWidth * 0.2 },
-    { opacity: 0.4, offset: 0 },
-    { opacity: 0.2, offset: shimmerWidth * 0.2 },
-    { opacity: 0.1, offset: shimmerWidth * 0.4 },
-  ];
+  // Generate opacities with sharp center and soft wide glow
+  const layerCount = Math.max(11, Math.round(shimmerWidth / 3));
+  const opacities = generateGlitterOpacities(layerCount, 1);
+  const layerWidth = shimmerWidth / layerCount;
+
+  const shimmerLayers = opacities.map((opacity, index) => ({
+    opacity,
+    position: index * layerWidth - shimmerWidth / 2 + layerWidth / 2,
+  }));
 
   return (
     <View style={[styles.container, style]} onLayout={onLayout}>
@@ -143,8 +193,8 @@ export function Glitter({
                   {
                     backgroundColor: color,
                     opacity: layer.opacity,
-                    width: shimmerWidth / shimmerLayers.length,
-                    transform: [{ translateX: layer.offset }],
+                    width: layerWidth + 0.5,
+                    left: layer.position,
                   },
                 ]}
               />
@@ -174,6 +224,7 @@ const styles = StyleSheet.create({
     height: '300%',
   },
   shimmerLine: {
+    position: 'absolute',
     height: '100%',
   },
 });

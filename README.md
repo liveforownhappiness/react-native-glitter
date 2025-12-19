@@ -182,3 +182,7 @@ MIT
 ---
 
 Made with ❤️ by [liveforownhappiness](https://github.com/liveforownhappiness)
+
+todo
+1.영상 readme 에 넣기
+2.line 말고, 전체 컴포넌트감싸고 거기서 라인 조절해보기
