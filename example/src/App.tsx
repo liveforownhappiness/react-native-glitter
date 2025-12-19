@@ -43,8 +43,13 @@ export default function App() {
 
       {/* Button Example */}
       <Text style={styles.sectionTitle}>Premium Button</Text>
-      <Glitter active={active} color="rgba(255, 215, 0, 0.5)" angle={25}>
-        <TouchableOpacity style={styles.premiumButton}>
+      <Glitter
+        active={active}
+        color="rgba(255, 215, 0, 0.5)"
+        angle={25}
+        style={styles.premiumButtonContainer}
+      >
+        <TouchableOpacity style={styles.premiumButtonInner}>
           <Text style={styles.premiumButtonText}>✨ Premium Feature</Text>
         </TouchableOpacity>
       </Glitter>
@@ -68,7 +73,7 @@ export default function App() {
       {/* Different Colors Example */}
       <Text style={styles.sectionTitle}>Custom Colors</Text>
       <View style={styles.colorRow}>
-        <Glitter active={active} color="rgba(255, 100, 100, 0.5)">
+        <Glitter active={active} color="rgba(36, 33, 33, 0.2)">
           <View style={[styles.colorBox, styles.colorBoxRed]} />
         </Glitter>
         <Glitter active={active} color="rgba(100, 255, 100, 0.5)">
@@ -191,12 +196,14 @@ const styles = StyleSheet.create({
     color: '#a0a0a0',
     lineHeight: 22,
   },
-  premiumButton: {
+  premiumButtonContainer: {
+    marginBottom: 20,
+  },
+  premiumButtonInner: {
     backgroundColor: '#6c5ce7',
     borderRadius: 12,
     padding: 18,
     alignItems: 'center',
-    marginBottom: 20,
   },
   premiumButtonText: {
     color: '#ffffff',
