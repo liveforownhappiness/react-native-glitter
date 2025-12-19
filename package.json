@@ -1,7 +1,7 @@
 {
   "name": "react-native-glitter",
   "version": "0.1.0",
-  "description": "glittering component",
+  "description": "A beautiful shimmer/glitter effect component for React Native. Add a sparkling diagonal shine animation to any component!",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
   "exports": {
@@ -43,7 +43,16 @@
   "keywords": [
     "react-native",
     "ios",
-    "android"
+    "android",
+    "expo",
+    "glitter",
+    "shimmer",
+    "shine",
+    "skeleton",
+    "loading",
+    "animation",
+    "effect",
+    "sparkle"
   ],
   "repository": {
     "type": "git",
