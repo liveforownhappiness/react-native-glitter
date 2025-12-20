@@ -156,6 +156,29 @@ export default function App() {
         </View>
       </View>
 
+      {/* Expand Positions */}
+      <Text style={styles.sectionTitle}>Expand Positions</Text>
+      <View style={styles.modeRow}>
+        <View style={styles.modeItem}>
+          <Text style={styles.modeLabel}>Top</Text>
+          <Glitter active={active} mode="expand" position="top">
+            <View style={styles.modeBox} />
+          </Glitter>
+        </View>
+        <View style={styles.modeItem}>
+          <Text style={styles.modeLabel}>Center</Text>
+          <Glitter active={active} mode="expand" position="center">
+            <View style={styles.modeBox} />
+          </Glitter>
+        </View>
+        <View style={styles.modeItem}>
+          <Text style={styles.modeLabel}>Bottom</Text>
+          <Glitter active={active} mode="expand" position="bottom">
+            <View style={styles.modeBox} />
+          </Glitter>
+        </View>
+      </View>
+
       {/* Shrink Positions */}
       <Text style={styles.sectionTitle}>Shrink Positions</Text>
       <View style={styles.modeRow}>
