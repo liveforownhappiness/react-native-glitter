@@ -31,8 +31,8 @@ export default function App() {
 
       {/* Basic Card Example */}
       <Text style={styles.sectionTitle}>Basic Card</Text>
-      <Glitter active={active}>
-        <View style={styles.card}>
+      <Glitter active={active} style={styles.cardGlitter}>
+        <View style={styles.cardInner}>
           <Text style={styles.cardTitle}>Loading Content</Text>
           <Text style={styles.cardText}>
             This card has a beautiful shimmer effect that makes it look like
@@ -248,11 +248,14 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     marginTop: 10,
   },
-  card: {
+  cardGlitter: {
+    borderRadius: 16,
+    marginBottom: 20,
+  },
+  cardInner: {
     backgroundColor: '#2d2d44',
     borderRadius: 16,
     padding: 20,
-    marginBottom: 20,
   },
   cardTitle: {
     fontSize: 20,

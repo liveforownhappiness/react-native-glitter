@@ -64,8 +64,8 @@ interface VerticalSegment {
   opacity: number;
 }
 
-function generateVerticalSegments(): VerticalSegment[] {
-  const fadeRatio = 0.25;
+function generateVerticalSegments(fadeRatioParam?: number): VerticalSegment[] {
+  const fadeRatio = fadeRatioParam ?? 0.25;
   const solidRatio = 1 - fadeRatio * 2;
   const fadeSegments = 5;
 
@@ -164,7 +164,8 @@ export function Glitter({
     outputRange: [-shimmerWidth - extraWidth, containerWidth + shimmerWidth],
   });
 
-  const lineHeight = containerHeight * 1.5;
+  const heightMultiplier = 1.5;
+  const lineHeight = containerHeight * heightMultiplier;
 
   const getScaleY = (): Animated.AnimatedInterpolation<number> | number => {
     if (mode === 'normal') {
@@ -203,7 +204,9 @@ export function Glitter({
   const horizontalOpacities = generateGlitterOpacities(layerCount, 1);
   const layerWidth = shimmerWidth / layerCount;
 
-  const verticalSegments = generateVerticalSegments();
+  const normalFadeRatio = (heightMultiplier - 1) / heightMultiplier / 2;
+  const normalSegments = generateVerticalSegments(normalFadeRatio);
+  const animatedSegments = generateVerticalSegments(0.25);
 
   const shimmerLayers = horizontalOpacities.map((opacity, index) => ({
     opacity,
@@ -259,17 +262,19 @@ export function Glitter({
                   },
                 ]}
               >
-                {verticalSegments.map((segment, vIndex) => (
-                  <View
-                    key={vIndex}
-                    style={{
-                      width: '100%',
-                      height: lineHeight * segment.heightRatio,
-                      backgroundColor: color,
-                      opacity: layer.opacity * segment.opacity,
-                    }}
-                  />
-                ))}
+                {(isAnimated ? animatedSegments : normalSegments).map(
+                  (segment, vIndex) => (
+                    <View
+                      key={vIndex}
+                      style={{
+                        width: '100%',
+                        height: lineHeight * segment.heightRatio,
+                        backgroundColor: color,
+                        opacity: layer.opacity * segment.opacity,
+                      }}
+                    />
+                  )
+                )}
               </Animated.View>
             ))}
           </View>
