@@ -133,6 +133,52 @@ export default function App() {
         </View>
       </View>
 
+      {/* Animation Modes */}
+      <Text style={styles.sectionTitle}>Animation Modes</Text>
+      <View style={styles.modeRow}>
+        <View style={styles.modeItem}>
+          <Text style={styles.modeLabel}>Normal</Text>
+          <Glitter active={active} mode="normal">
+            <View style={styles.modeBox} />
+          </Glitter>
+        </View>
+        <View style={styles.modeItem}>
+          <Text style={styles.modeLabel}>Expand</Text>
+          <Glitter active={active} mode="expand">
+            <View style={styles.modeBox} />
+          </Glitter>
+        </View>
+        <View style={styles.modeItem}>
+          <Text style={styles.modeLabel}>Shrink</Text>
+          <Glitter active={active} mode="shrink">
+            <View style={styles.modeBox} />
+          </Glitter>
+        </View>
+      </View>
+
+      {/* Shrink Positions */}
+      <Text style={styles.sectionTitle}>Shrink Positions</Text>
+      <View style={styles.modeRow}>
+        <View style={styles.modeItem}>
+          <Text style={styles.modeLabel}>Top</Text>
+          <Glitter active={active} mode="shrink" position="top">
+            <View style={styles.modeBox} />
+          </Glitter>
+        </View>
+        <View style={styles.modeItem}>
+          <Text style={styles.modeLabel}>Center</Text>
+          <Glitter active={active} mode="shrink" position="center">
+            <View style={styles.modeBox} />
+          </Glitter>
+        </View>
+        <View style={styles.modeItem}>
+          <Text style={styles.modeLabel}>Bottom</Text>
+          <Glitter active={active} mode="shrink" position="bottom">
+            <View style={styles.modeBox} />
+          </Glitter>
+        </View>
+      </View>
+
       <View style={styles.footer} />
     </ScrollView>
   );
@@ -299,6 +345,25 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 16,
     fontWeight: '600',
+  },
+  modeRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  modeItem: {
+    alignItems: 'center',
+  },
+  modeLabel: {
+    color: '#a0a0a0',
+    fontSize: 12,
+    marginBottom: 8,
+  },
+  modeBox: {
+    width: 100,
+    height: 80,
+    backgroundColor: '#2d2d44',
+    borderRadius: 10,
   },
   footer: {
     height: 50,

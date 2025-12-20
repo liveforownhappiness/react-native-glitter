@@ -14,6 +14,7 @@ Works with both **React Native CLI** and **Expo** projects - no native dependenc
 - 🎨 **Customizable** - Control color, speed, angle, and more
 - ⚡ **Performant** - Uses native driver for smooth 60fps animations
 - 🔧 **TypeScript** - Full TypeScript support with type definitions
+- ✨ **Animation Modes** - Normal, expand, and shrink effects
 
 ## Installation
 
@@ -43,6 +44,48 @@ function MyComponent() {
     </Glitter>
   );
 }
+```
+
+### Animation Modes
+
+Control how the shimmer line behaves during animation:
+
+```tsx
+// Normal - constant size (default)
+<Glitter mode="normal">
+  <View style={styles.box} />
+</Glitter>
+
+// Expand - starts small and grows
+<Glitter mode="expand">
+  <View style={styles.box} />
+</Glitter>
+
+// Shrink - starts full size and shrinks
+<Glitter mode="shrink">
+  <View style={styles.box} />
+</Glitter>
+```
+
+### Shrink/Expand Positions
+
+For `shrink` and `expand` modes, control where the line shrinks to or expands from:
+
+```tsx
+// Shrink to top
+<Glitter mode="shrink" position="top">
+  <View style={styles.box} />
+</Glitter>
+
+// Shrink to center (default)
+<Glitter mode="shrink" position="center">
+  <View style={styles.box} />
+</Glitter>
+
+// Shrink to bottom
+<Glitter mode="shrink" position="bottom">
+  <View style={styles.box} />
+</Glitter>
 ```
 
 ### Skeleton Loading
@@ -105,13 +148,15 @@ function ControlledGlitter() {
 |------|------|---------|-------------|
 | `children` | `ReactNode` | **required** | The content to apply the shimmer effect to |
 | `duration` | `number` | `1500` | Duration of one shimmer animation cycle in milliseconds |
-| `delay` | `number` | `500` | Delay between animation cycles in milliseconds |
-| `color` | `string` | `'rgba(255, 255, 255, 0.4)'` | Color of the shimmer effect |
+| `delay` | `number` | `400` | Delay between animation cycles in milliseconds |
+| `color` | `string` | `'rgba(255, 255, 255, 0.8)'` | Color of the shimmer effect |
 | `angle` | `number` | `20` | Angle of the shimmer in degrees |
 | `shimmerWidth` | `number` | `60` | Width of the shimmer band in pixels |
 | `active` | `boolean` | `true` | Whether the animation is active |
 | `style` | `ViewStyle` | - | Additional styles for the container |
 | `easing` | `(value: number) => number` | - | Custom easing function for the animation |
+| `mode` | `'normal' \| 'expand' \| 'shrink'` | `'normal'` | Animation mode for the shimmer line |
+| `position` | `'top' \| 'center' \| 'bottom'` | `'center'` | Position where the line shrinks/expands (for shrink/expand modes) |
 
 ## Examples
 
@@ -157,17 +202,38 @@ function ControlledGlitter() {
 </Glitter>
 ```
 
+### Animation Modes
+
+```tsx
+// Expand mode - line grows as it moves
+<Glitter mode="expand">
+  <View style={styles.box} />
+</Glitter>
+
+// Shrink mode with position - line shrinks to bottom
+<Glitter mode="shrink" position="bottom">
+  <View style={styles.box} />
+</Glitter>
+```
+
 ## TypeScript
 
 This library is written in TypeScript and includes type definitions:
 
 ```tsx
-import { Glitter, type GlitterProps } from 'react-native-glitter';
+import {
+  Glitter,
+  type GlitterProps,
+  type GlitterMode,
+  type GlitterPosition,
+} from 'react-native-glitter';
 
 const customProps: GlitterProps = {
   children: <View />,
   duration: 2000,
   color: 'rgba(255, 255, 255, 0.3)',
+  mode: 'shrink',
+  position: 'center',
 };
 ```
 
