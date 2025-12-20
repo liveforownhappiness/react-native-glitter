@@ -61,7 +61,7 @@ function generateGlitterOpacities(count: number, peak: number = 1): number[] {
 
 export function Glitter({
   children,
-  duration = 1500,
+  duration = 5000,
   delay = 400,
   color = 'rgba(255, 255, 255, 0.8)',
   angle = 20,
@@ -129,7 +129,7 @@ export function Glitter({
   });
 
   const angleRad = (angle * Math.PI) / 180;
-  const lineHeight = containerHeight / Math.cos(angleRad);
+  const lineHeight = (containerHeight / Math.cos(angleRad)) * 1.5;
 
   const getScaleY = (): Animated.AnimatedInterpolation<number> | number => {
     if (mode === 'normal') {
@@ -149,17 +149,24 @@ export function Glitter({
     });
   };
 
+  const halfHeight = lineHeight / 2;
+  const startOffset = halfHeight * (1 - Math.cos(angleRad));
+
   const getTransformOriginOffset = (): number => {
-    if (mode === 'normal' || position === 'center') {
+    if (mode === 'normal') {
       return 0;
     }
 
-    const halfHeight = lineHeight / 2;
+    const angleOffset = halfHeight * Math.sin(angleRad);
+
+    if (position === 'center') {
+      return angleOffset;
+    }
 
     if (position === 'top') {
-      return -halfHeight;
+      return -halfHeight + angleOffset;
     } else {
-      return halfHeight;
+      return halfHeight + angleOffset;
     }
   };
 
@@ -210,19 +217,17 @@ export function Glitter({
                     width: layerWidth + 0.5,
                     height: lineHeight,
                     left: layer.position,
-                  },
-                  isAnimated
-                    ? {
-                        transform: [
-                          { translateY: transformOriginOffset },
+                    transform: isAnimated
+                      ? [
+                          { translateY: startOffset + transformOriginOffset },
                           {
                             scaleY:
                               scaleY as Animated.AnimatedInterpolation<number>,
                           },
                           { translateY: -transformOriginOffset },
-                        ],
-                      }
-                    : {},
+                        ]
+                      : [{ translateY: startOffset }],
+                  },
                 ]}
               />
             ))}
