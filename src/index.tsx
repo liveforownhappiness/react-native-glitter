@@ -128,8 +128,7 @@ export function Glitter({
     outputRange: [-shimmerWidth - extraWidth, containerWidth + shimmerWidth],
   });
 
-  const angleRad = (angle * Math.PI) / 180;
-  const lineHeight = (containerHeight / Math.cos(angleRad)) * 1.5;
+  const lineHeight = containerHeight * 1.5;
 
   const getScaleY = (): Animated.AnimatedInterpolation<number> | number => {
     if (mode === 'normal') {
@@ -150,23 +149,17 @@ export function Glitter({
   };
 
   const halfHeight = lineHeight / 2;
-  const startOffset = halfHeight * (1 - Math.cos(angleRad));
+  const startOffset = 0;
 
   const getTransformOriginOffset = (): number => {
-    if (mode === 'normal') {
+    if (mode === 'normal' || position === 'center') {
       return 0;
     }
 
-    const angleOffset = halfHeight * Math.sin(angleRad);
-
-    if (position === 'center') {
-      return angleOffset;
-    }
-
     if (position === 'top') {
-      return -halfHeight + angleOffset;
+      return -halfHeight;
     } else {
-      return halfHeight + angleOffset;
+      return halfHeight;
     }
   };
 
@@ -202,7 +195,7 @@ export function Glitter({
               {
                 width: shimmerWidth,
                 height: lineHeight,
-                transform: [{ rotate: `${angle}deg` }],
+                transform: [{ skewX: `${-angle}deg` }],
               },
             ]}
           >
