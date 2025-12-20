@@ -59,9 +59,45 @@ function generateGlitterOpacities(count: number, peak: number = 1): number[] {
   return opacities;
 }
 
+interface VerticalSegment {
+  heightRatio: number;
+  opacity: number;
+}
+
+function generateVerticalSegments(): VerticalSegment[] {
+  const fadeRatio = 0.25;
+  const solidRatio = 1 - fadeRatio * 2;
+  const fadeSegments = 5;
+
+  const segments: VerticalSegment[] = [];
+
+  for (let i = 0; i < fadeSegments; i++) {
+    const opacity = (i + 1) / fadeSegments;
+    segments.push({
+      heightRatio: fadeRatio / fadeSegments,
+      opacity: Math.pow(opacity, 2),
+    });
+  }
+
+  segments.push({
+    heightRatio: solidRatio,
+    opacity: 1,
+  });
+
+  for (let i = fadeSegments - 1; i >= 0; i--) {
+    const opacity = (i + 1) / fadeSegments;
+    segments.push({
+      heightRatio: fadeRatio / fadeSegments,
+      opacity: Math.pow(opacity, 2),
+    });
+  }
+
+  return segments;
+}
+
 export function Glitter({
   children,
-  duration = 5000,
+  duration = 1500,
   delay = 400,
   color = 'rgba(255, 255, 255, 0.8)',
   angle = 20,
@@ -164,10 +200,12 @@ export function Glitter({
   };
 
   const layerCount = Math.max(11, Math.round(shimmerWidth / 3));
-  const opacities = generateGlitterOpacities(layerCount, 1);
+  const horizontalOpacities = generateGlitterOpacities(layerCount, 1);
   const layerWidth = shimmerWidth / layerCount;
 
-  const shimmerLayers = opacities.map((opacity, index) => ({
+  const verticalSegments = generateVerticalSegments();
+
+  const shimmerLayers = horizontalOpacities.map((opacity, index) => ({
     opacity,
     position: index * layerWidth - shimmerWidth / 2 + layerWidth / 2,
   }));
@@ -199,14 +237,12 @@ export function Glitter({
               },
             ]}
           >
-            {shimmerLayers.map((layer, index) => (
+            {shimmerLayers.map((layer, layerIndex) => (
               <Animated.View
-                key={index}
+                key={layerIndex}
                 style={[
                   styles.shimmerLine,
                   {
-                    backgroundColor: color,
-                    opacity: layer.opacity,
                     width: layerWidth + 0.5,
                     height: lineHeight,
                     left: layer.position,
@@ -222,7 +258,19 @@ export function Glitter({
                       : [{ translateY: startOffset }],
                   },
                 ]}
-              />
+              >
+                {verticalSegments.map((segment, vIndex) => (
+                  <View
+                    key={vIndex}
+                    style={{
+                      width: '100%',
+                      height: lineHeight * segment.heightRatio,
+                      backgroundColor: color,
+                      opacity: layer.opacity * segment.opacity,
+                    }}
+                  />
+                ))}
+              </Animated.View>
             ))}
           </View>
         </Animated.View>
@@ -249,6 +297,7 @@ const styles = StyleSheet.create({
   },
   shimmerLine: {
     position: 'absolute',
+    flexDirection: 'column',
   },
 });
 
