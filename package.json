@@ -56,7 +56,8 @@
     "loading",
     "animation",
     "effect",
-    "sparkle"
+    "sparkle",
+    "react-native-glitter"
   ],
   "repository": {
     "type": "git",
