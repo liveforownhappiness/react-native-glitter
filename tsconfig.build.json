@@ -1,4 +1,18 @@
 {
-  "extends": "./tsconfig",
-  "exclude": ["example", "lib"]
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./lib/module",
+    "declarationDir": "./lib/typescript/src",
+    "declaration": true,
+    "esModuleInterop": true,
+    "jsx": "react-jsx",
+    "lib": ["ESNext"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "ESNext"
+  },
+  "include": ["src"],
+  "exclude": ["example", "lib", "**/__tests__"]
 }

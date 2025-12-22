@@ -38,7 +38,7 @@
     "example:android": "yarn workspace react-native-glitter-example android",
     "example:web": "yarn workspace react-native-glitter-example web",
     "clean": "del-cli lib",
-    "prepare": "bob build",
+    "prepare": "yarn clean && tsc -p tsconfig.build.json",
     "typecheck": "tsc",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
     "test": "jest",
