@@ -7,6 +7,12 @@ Works with both **React Native CLI** and **Expo** projects - no native dependenc
 ![npm](https://img.shields.io/npm/v/react-native-glitter)
 ![license](https://img.shields.io/npm/l/react-native-glitter)
 
+## Demo
+
+<p align="center">
+  <img src="./assets/demo.gif" alt="React Native Glitter Demo" width="320" />
+</p>
+
 ## Features
 
 - 🚀 **Zero native dependencies** - Pure JavaScript/TypeScript implementation
@@ -248,7 +254,3 @@ MIT
 ---
 
 Made with ❤️ by [liveforownhappiness](https://github.com/liveforownhappiness)
-
-todo
-1.영상 readme 에 넣기
-2.line 말고, 전체 컴포넌트감싸고 거기서 라인 조절해보기
