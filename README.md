@@ -163,6 +163,7 @@ function ControlledGlitter() {
 | `easing` | `(value: number) => number` | - | Custom easing function for the animation |
 | `mode` | `'normal' \| 'expand' \| 'shrink'` | `'normal'` | Animation mode for the shimmer line |
 | `position` | `'top' \| 'center' \| 'bottom'` | `'center'` | Position where the line shrinks/expands (for shrink/expand modes) |
+| `direction` | `'left-to-right' \| 'right-to-left'` | `'left-to-right'` | Direction of the shimmer animation |
 
 ## Examples
 
@@ -222,6 +223,20 @@ function ControlledGlitter() {
 </Glitter>
 ```
 
+### Direction
+
+```tsx
+// Left to right (default)
+<Glitter direction="left-to-right">
+  <View style={styles.box} />
+</Glitter>
+
+// Right to left
+<Glitter direction="right-to-left">
+  <View style={styles.box} />
+</Glitter>
+```
+
 ## TypeScript
 
 This library is written in TypeScript and includes type definitions:
@@ -232,6 +247,7 @@ import {
   type GlitterProps,
   type GlitterMode,
   type GlitterPosition,
+  type GlitterDirection,
 } from 'react-native-glitter';
 
 const customProps: GlitterProps = {

@@ -20,6 +20,8 @@ export type GlitterMode = 'normal' | 'expand' | 'shrink';
 
 export type GlitterPosition = 'top' | 'center' | 'bottom';
 
+export type GlitterDirection = 'left-to-right' | 'right-to-left';
+
 export interface GlitterProps {
   children: ReactNode;
   duration?: number;
@@ -32,6 +34,7 @@ export interface GlitterProps {
   easing?: (value: number) => number;
   mode?: GlitterMode;
   position?: GlitterPosition;
+  direction?: GlitterDirection;
 }
 
 function generateGlitterOpacities(count: number, peak: number = 1): number[] {
@@ -107,6 +110,7 @@ export function Glitter({
   easing,
   mode = 'normal',
   position = 'center',
+  direction = 'left-to-right',
 }: GlitterProps): ReactElement {
   const animatedValue = useRef(new Animated.Value(0)).current;
   const [containerWidth, setContainerWidth] = useState(0);
@@ -159,9 +163,12 @@ export function Glitter({
 
   const extraWidth = Math.tan((angle * Math.PI) / 180) * 200;
 
+  const isLeftToRight = direction === 'left-to-right';
   const translateX = animatedValue.interpolate({
     inputRange: [0, 1],
-    outputRange: [-shimmerWidth - extraWidth, containerWidth + shimmerWidth],
+    outputRange: isLeftToRight
+      ? [-shimmerWidth - extraWidth, containerWidth + shimmerWidth]
+      : [containerWidth + shimmerWidth, -shimmerWidth - extraWidth],
   });
 
   const heightMultiplier = 1.5;
