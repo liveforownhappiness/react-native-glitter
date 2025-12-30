@@ -164,6 +164,8 @@ function ControlledGlitter() {
 | `mode` | `'normal' \| 'expand' \| 'shrink'` | `'normal'` | Animation mode for the shimmer line |
 | `position` | `'top' \| 'center' \| 'bottom'` | `'center'` | Position where the line shrinks/expands (for shrink/expand modes) |
 | `direction` | `'left-to-right' \| 'right-to-left'` | `'left-to-right'` | Direction of the shimmer animation |
+| `iterations` | `number` | `-1` | Number of animation cycles (-1 for infinite) |
+| `onAnimationComplete` | `() => void` | - | Callback when all iterations complete |
 
 ## Examples
 
@@ -234,6 +236,26 @@ function ControlledGlitter() {
 // Right to left
 <Glitter direction="right-to-left">
   <View style={styles.box} />
+</Glitter>
+```
+
+### Limited Iterations with Callback
+
+```tsx
+// Run 3 times then call onAnimationComplete
+<Glitter 
+  iterations={3} 
+  onAnimationComplete={() => console.log('Done!')}
+>
+  <View style={styles.box} />
+</Glitter>
+
+// Run once (useful for loading states)
+<Glitter 
+  iterations={1} 
+  onAnimationComplete={() => setLoading(false)}
+>
+  <View style={styles.skeleton} />
 </Glitter>
 ```
 

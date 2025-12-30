@@ -35,6 +35,8 @@ export interface GlitterProps {
   mode?: GlitterMode;
   position?: GlitterPosition;
   direction?: GlitterDirection;
+  iterations?: number;
+  onAnimationComplete?: () => void;
 }
 
 function generateGlitterOpacities(count: number, peak: number = 1): number[] {
@@ -111,11 +113,14 @@ export function Glitter({
   mode = 'normal',
   position = 'center',
   direction = 'left-to-right',
+  iterations = -1,
+  onAnimationComplete,
 }: GlitterProps): ReactElement {
   const animatedValue = useRef(new Animated.Value(0)).current;
   const [containerWidth, setContainerWidth] = useState(0);
   const [containerHeight, setContainerHeight] = useState(0);
-  const animationRef = useRef<ReturnType<typeof Animated.loop> | null>(null);
+  const animationRef = useRef<Animated.CompositeAnimation | null>(null);
+  const iterationCount = useRef(0);
 
   const defaultEasing = Easing.bezier(0.4, 0, 0.2, 1);
 
@@ -123,6 +128,7 @@ export function Glitter({
     if (!active || containerWidth === 0) return;
 
     animatedValue.setValue(0);
+    iterationCount.current = 0;
 
     const timing = Animated.timing(animatedValue, {
       toValue: 1,
@@ -131,11 +137,28 @@ export function Glitter({
       easing: easing ?? defaultEasing,
     });
 
-    animationRef.current = Animated.loop(
-      Animated.sequence([timing, Animated.delay(delay)])
-    );
+    const singleIteration = Animated.sequence([timing, Animated.delay(delay)]);
 
-    animationRef.current.start();
+    const runIteration = () => {
+      animatedValue.setValue(0);
+      singleIteration.start(({ finished }) => {
+        if (finished) {
+          iterationCount.current += 1;
+          if (iterations === -1 || iterationCount.current < iterations) {
+            runIteration();
+          } else {
+            onAnimationComplete?.();
+          }
+        }
+      });
+    };
+
+    if (iterations === -1) {
+      animationRef.current = Animated.loop(singleIteration);
+      animationRef.current.start();
+    } else {
+      runIteration();
+    }
 
     return () => {
       animationRef.current?.stop();
@@ -148,6 +171,8 @@ export function Glitter({
     animatedValue,
     easing,
     defaultEasing,
+    iterations,
+    onAnimationComplete,
   ]);
 
   useEffect(() => {
