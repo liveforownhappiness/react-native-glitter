@@ -119,7 +119,9 @@ export function Glitter({
   const animatedValue = useRef(new Animated.Value(0)).current;
   const [containerWidth, setContainerWidth] = useState(0);
   const [containerHeight, setContainerHeight] = useState(0);
-  const animationRef = useRef<Animated.CompositeAnimation | null>(null);
+  const animationRef = useRef<{ start: () => void; stop: () => void } | null>(
+    null
+  );
   const iterationCount = useRef(0);
 
   const defaultEasing = Easing.bezier(0.4, 0, 0.2, 1);
@@ -298,12 +300,14 @@ export function Glitter({
                   (segment, vIndex) => (
                     <View
                       key={vIndex}
-                      style={{
-                        width: '100%',
-                        height: lineHeight * segment.heightRatio,
-                        backgroundColor: color,
-                        opacity: layer.opacity * segment.opacity,
-                      }}
+                      style={[
+                        styles.segment,
+                        {
+                          height: lineHeight * segment.heightRatio,
+                          backgroundColor: color,
+                          opacity: layer.opacity * segment.opacity,
+                        },
+                      ]}
                     />
                   )
                 )}
@@ -335,6 +339,9 @@ const styles = StyleSheet.create({
   shimmerLine: {
     position: 'absolute',
     flexDirection: 'column',
+  },
+  segment: {
+    width: '100%',
   },
 });
 
