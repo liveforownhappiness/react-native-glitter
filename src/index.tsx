@@ -3,6 +3,7 @@ import {
   useRef,
   useState,
   useCallback,
+  useMemo,
   type ReactNode,
   type ReactElement,
 } from 'react';
@@ -36,6 +37,7 @@ export interface GlitterProps {
   position?: GlitterPosition;
   direction?: GlitterDirection;
   iterations?: number;
+  onAnimationStart?: () => void;
   onAnimationComplete?: () => void;
 }
 
@@ -114,57 +116,76 @@ export function Glitter({
   position = 'center',
   direction = 'left-to-right',
   iterations = -1,
+  onAnimationStart,
   onAnimationComplete,
 }: GlitterProps): ReactElement {
   const animatedValue = useRef(new Animated.Value(0)).current;
   const [containerWidth, setContainerWidth] = useState(0);
   const [containerHeight, setContainerHeight] = useState(0);
-  const animationRef = useRef<{ start: () => void; stop: () => void } | null>(
-    null
-  );
+  const animationRef = useRef<ReturnType<typeof Animated.loop> | null>(null);
+  const currentIterationRef = useRef<ReturnType<
+    typeof Animated.sequence
+  > | null>(null);
   const iterationCount = useRef(0);
+  const isAnimatingRef = useRef(false);
 
-  const defaultEasing = Easing.bezier(0.4, 0, 0.2, 1);
+  const defaultEasing = useMemo(() => Easing.bezier(0.4, 0, 0.2, 1), []);
+
+  const stopAnimation = useCallback(() => {
+    isAnimatingRef.current = false;
+    animationRef.current?.stop();
+    animationRef.current = null;
+    currentIterationRef.current?.stop();
+    currentIterationRef.current = null;
+  }, []);
 
   const startAnimation = useCallback(() => {
     if (!active || containerWidth === 0) return;
 
+    stopAnimation();
     animatedValue.setValue(0);
     iterationCount.current = 0;
+    isAnimatingRef.current = true;
 
-    const timing = Animated.timing(animatedValue, {
-      toValue: 1,
-      duration,
-      useNativeDriver: true,
-      easing: easing ?? defaultEasing,
-    });
+    onAnimationStart?.();
 
-    const singleIteration = Animated.sequence([timing, Animated.delay(delay)]);
+    const createSingleIteration = () =>
+      Animated.sequence([
+        Animated.timing(animatedValue, {
+          toValue: 1,
+          duration,
+          useNativeDriver: true,
+          easing: easing ?? defaultEasing,
+        }),
+        Animated.delay(delay),
+      ]);
 
     const runIteration = () => {
+      if (!isAnimatingRef.current) return;
+
       animatedValue.setValue(0);
-      singleIteration.start(({ finished }) => {
-        if (finished) {
-          iterationCount.current += 1;
-          if (iterations === -1 || iterationCount.current < iterations) {
-            runIteration();
-          } else {
-            onAnimationComplete?.();
+      currentIterationRef.current = createSingleIteration();
+      currentIterationRef.current.start(
+        ({ finished }: { finished: boolean }) => {
+          if (finished && isAnimatingRef.current) {
+            iterationCount.current += 1;
+            if (iterations === -1 || iterationCount.current < iterations) {
+              runIteration();
+            } else {
+              isAnimatingRef.current = false;
+              onAnimationComplete?.();
+            }
           }
         }
-      });
+      );
     };
 
     if (iterations === -1) {
-      animationRef.current = Animated.loop(singleIteration);
+      animationRef.current = Animated.loop(createSingleIteration());
       animationRef.current.start();
     } else {
       runIteration();
     }
-
-    return () => {
-      animationRef.current?.stop();
-    };
   }, [
     active,
     containerWidth,
@@ -174,13 +195,15 @@ export function Glitter({
     easing,
     defaultEasing,
     iterations,
+    onAnimationStart,
     onAnimationComplete,
+    stopAnimation,
   ]);
 
   useEffect(() => {
-    const cleanup = startAnimation();
-    return cleanup;
-  }, [startAnimation]);
+    startAnimation();
+    return stopAnimation;
+  }, [startAnimation, stopAnimation]);
 
   const onLayout = useCallback((event: LayoutChangeEvent) => {
     const { width, height } = event.nativeEvent.layout;
@@ -188,7 +211,10 @@ export function Glitter({
     setContainerHeight(height);
   }, []);
 
-  const extraWidth = Math.tan((angle * Math.PI) / 180) * 200;
+  const extraWidth = useMemo(
+    () => Math.tan((angle * Math.PI) / 180) * 200,
+    [angle]
+  );
 
   const isLeftToRight = direction === 'left-to-right';
   const translateX = animatedValue.interpolate({
@@ -201,7 +227,9 @@ export function Glitter({
   const heightMultiplier = 1.5;
   const lineHeight = containerHeight * heightMultiplier;
 
-  const getScaleY = (): Animated.AnimatedInterpolation<number> | number => {
+  const scaleY = useMemo(():
+    | Animated.AnimatedInterpolation<number>
+    | number => {
     if (mode === 'normal') {
       return 1;
     }
@@ -217,12 +245,12 @@ export function Glitter({
       inputRange: [0, 1],
       outputRange: [1, 0.01],
     });
-  };
+  }, [mode, animatedValue]);
 
   const halfHeight = lineHeight / 2;
   const startOffset = 0;
 
-  const getTransformOriginOffset = (): number => {
+  const transformOriginOffset = useMemo((): number => {
     if (mode === 'normal' || position === 'center') {
       return 0;
     }
@@ -232,23 +260,41 @@ export function Glitter({
     } else {
       return halfHeight;
     }
-  };
+  }, [mode, position, halfHeight]);
 
-  const layerCount = Math.max(11, Math.round(shimmerWidth / 3));
-  const horizontalOpacities = generateGlitterOpacities(layerCount, 1);
-  const layerWidth = shimmerWidth / layerCount;
+  const layerCount = useMemo(
+    () => Math.max(11, Math.round(shimmerWidth / 3)),
+    [shimmerWidth]
+  );
+
+  const layerWidth = useMemo(
+    () => shimmerWidth / layerCount,
+    [shimmerWidth, layerCount]
+  );
+
+  const horizontalOpacities = useMemo(
+    () => generateGlitterOpacities(layerCount, 1),
+    [layerCount]
+  );
 
   const normalFadeRatio = (heightMultiplier - 1) / heightMultiplier / 2;
-  const normalSegments = generateVerticalSegments(normalFadeRatio);
-  const animatedSegments = generateVerticalSegments(0.25);
 
-  const shimmerLayers = horizontalOpacities.map((opacity, index) => ({
-    opacity,
-    position: index * layerWidth - shimmerWidth / 2 + layerWidth / 2,
-  }));
+  const normalSegments = useMemo(
+    () => generateVerticalSegments(normalFadeRatio),
+    [normalFadeRatio]
+  );
 
-  const scaleY = getScaleY();
-  const transformOriginOffset = getTransformOriginOffset();
+  const animatedSegments = useMemo(() => generateVerticalSegments(0.25), []);
+
+  const shimmerLayers = useMemo(
+    () =>
+      horizontalOpacities.map((opacity, index) => ({
+        opacity,
+        position: index * layerWidth - shimmerWidth / 2 + layerWidth / 2,
+      })),
+    [horizontalOpacities, layerWidth, shimmerWidth]
+  );
+
   const isAnimated = mode !== 'normal';
 
   return (

@@ -165,6 +165,7 @@ function ControlledGlitter() {
 | `position` | `'top' \| 'center' \| 'bottom'` | `'center'` | Position where the line shrinks/expands (for shrink/expand modes) |
 | `direction` | `'left-to-right' \| 'right-to-left'` | `'left-to-right'` | Direction of the shimmer animation |
 | `iterations` | `number` | `-1` | Number of animation cycles (-1 for infinite) |
+| `onAnimationStart` | `() => void` | - | Callback when animation starts |
 | `onAnimationComplete` | `() => void` | - | Callback when all iterations complete |
 
 ## Examples
@@ -245,6 +246,7 @@ function ControlledGlitter() {
 // Run 3 times then call onAnimationComplete
 <Glitter 
   iterations={3} 
+  onAnimationStart={() => console.log('Started!')}
   onAnimationComplete={() => console.log('Done!')}
 >
   <View style={styles.box} />
