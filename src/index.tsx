@@ -4,6 +4,7 @@ import {
   useState,
   useCallback,
   useMemo,
+  memo,
   type ReactNode,
   type ReactElement,
 } from 'react';
@@ -102,7 +103,12 @@ function generateVerticalSegments(fadeRatioParam?: number): VerticalSegment[] {
   return segments;
 }
 
-export function Glitter({
+const HEIGHT_MULTIPLIER = 1.5;
+const NORMAL_FADE_RATIO = (HEIGHT_MULTIPLIER - 1) / HEIGHT_MULTIPLIER / 2;
+const ANIMATED_SEGMENTS = generateVerticalSegments(0.25);
+const NORMAL_SEGMENTS = generateVerticalSegments(NORMAL_FADE_RATIO);
+
+function GlitterComponent({
   children,
   duration = 1500,
   delay = 400,
@@ -217,15 +223,19 @@ export function Glitter({
   );
 
   const isLeftToRight = direction === 'left-to-right';
-  const translateX = animatedValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: isLeftToRight
-      ? [-shimmerWidth - extraWidth, containerWidth + shimmerWidth]
-      : [containerWidth + shimmerWidth, -shimmerWidth - extraWidth],
-  });
 
-  const heightMultiplier = 1.5;
-  const lineHeight = containerHeight * heightMultiplier;
+  const translateX = useMemo(
+    () =>
+      animatedValue.interpolate({
+        inputRange: [0, 1],
+        outputRange: isLeftToRight
+          ? [-shimmerWidth - extraWidth, containerWidth + shimmerWidth]
+          : [containerWidth + shimmerWidth, -shimmerWidth - extraWidth],
+      }),
+    [animatedValue, isLeftToRight, shimmerWidth, extraWidth, containerWidth]
+  );
+
+  const lineHeight = containerHeight * HEIGHT_MULTIPLIER;
 
   const scaleY = useMemo(():
     | Animated.AnimatedInterpolation<number>
@@ -248,18 +258,12 @@ export function Glitter({
   }, [mode, animatedValue]);
 
   const halfHeight = lineHeight / 2;
-  const startOffset = 0;
 
   const transformOriginOffset = useMemo((): number => {
     if (mode === 'normal' || position === 'center') {
       return 0;
     }
-
-    if (position === 'top') {
-      return -halfHeight;
-    } else {
-      return halfHeight;
-    }
+    return position === 'top' ? -halfHeight : halfHeight;
   }, [mode, position, halfHeight]);
 
   const layerCount = useMemo(
@@ -277,15 +281,6 @@ export function Glitter({
     [layerCount]
   );
 
-  const normalFadeRatio = (heightMultiplier - 1) / heightMultiplier / 2;
-
-  const normalSegments = useMemo(
-    () => generateVerticalSegments(normalFadeRatio),
-    [normalFadeRatio]
-  );
-
-  const animatedSegments = useMemo(() => generateVerticalSegments(0.25), []);
-
   const shimmerLayers = useMemo(
     () =>
       horizontalOpacities.map((opacity, index) => ({
@@ -296,67 +291,70 @@ export function Glitter({
   );
 
   const isAnimated = mode !== 'normal';
+  const segments = isAnimated ? ANIMATED_SEGMENTS : NORMAL_SEGMENTS;
+
+  const shimmerContainerStyle = useMemo(
+    () => [styles.shimmerContainer, { transform: [{ translateX }] }],
+    [translateX]
+  );
+
+  const rotationWrapperStyle = useMemo(
+    () => [
+      styles.rotationWrapper,
+      {
+        width: shimmerWidth,
+        height: lineHeight,
+        transform: [{ skewX: `${-angle}deg` }],
+      },
+    ],
+    [shimmerWidth, lineHeight, angle]
+  );
+
+  const getShimmerLineStyle = useCallback(
+    (layerPosition: number) => [
+      styles.shimmerLine,
+      {
+        width: layerWidth + 0.5,
+        height: lineHeight,
+        left: layerPosition,
+        transform: isAnimated
+          ? [
+              { translateY: transformOriginOffset },
+              {
+                scaleY: scaleY as Animated.AnimatedInterpolation<number>,
+              },
+              { translateY: -transformOriginOffset },
+            ]
+          : [],
+      },
+    ],
+    [layerWidth, lineHeight, isAnimated, transformOriginOffset, scaleY]
+  );
 
   return (
     <View style={[styles.container, style]} onLayout={onLayout}>
       {children}
       {active && containerWidth > 0 && containerHeight > 0 && (
-        <Animated.View
-          style={[
-            styles.shimmerContainer,
-            {
-              transform: [{ translateX }],
-            },
-          ]}
-          pointerEvents="none"
-        >
-          <View
-            style={[
-              styles.rotationWrapper,
-              {
-                width: shimmerWidth,
-                height: lineHeight,
-                transform: [{ skewX: `${-angle}deg` }],
-              },
-            ]}
-          >
+        <Animated.View style={shimmerContainerStyle} pointerEvents="none">
+          <View style={rotationWrapperStyle}>
             {shimmerLayers.map((layer, layerIndex) => (
               <Animated.View
                 key={layerIndex}
-                style={[
-                  styles.shimmerLine,
-                  {
-                    width: layerWidth + 0.5,
-                    height: lineHeight,
-                    left: layer.position,
-                    transform: isAnimated
-                      ? [
-                          { translateY: startOffset + transformOriginOffset },
-                          {
-                            scaleY:
-                              scaleY as Animated.AnimatedInterpolation<number>,
-                          },
-                          { translateY: -transformOriginOffset },
-                        ]
-                      : [{ translateY: startOffset }],
-                  },
-                ]}
+                style={getShimmerLineStyle(layer.position)}
               >
-                {(isAnimated ? animatedSegments : normalSegments).map(
-                  (segment, vIndex) => (
-                    <View
-                      key={vIndex}
-                      style={[
-                        styles.segment,
-                        {
-                          height: lineHeight * segment.heightRatio,
-                          backgroundColor: color,
-                          opacity: layer.opacity * segment.opacity,
-                        },
-                      ]}
-                    />
-                  )
-                )}
+                {segments.map((segment, vIndex) => (
+                  <View
+                    key={vIndex}
+                    style={[
+                      styles.segment,
+                      {
+                        height: lineHeight * segment.heightRatio,
+                        backgroundColor: color,
+                        opacity: layer.opacity * segment.opacity,
+                      },
+                    ]}
+                  />
+                ))}
               </Animated.View>
             ))}
           </View>
@@ -390,5 +388,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
 });
+
+export const Glitter = memo(GlitterComponent);
 
 export default Glitter;
