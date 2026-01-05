@@ -26,7 +26,9 @@ jest.mock('react-native', () => {
 describe('Glitter', () => {
   it('should export Glitter component', () => {
     expect(Glitter).toBeDefined();
-    expect(typeof Glitter).toBe('function');
+    // React.memo returns an object, not a function
+    expect(typeof Glitter).toBe('object');
+    expect(Glitter.$$typeof).toBeDefined();
   });
 
   it('should render without crashing', () => {
