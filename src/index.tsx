@@ -40,6 +40,12 @@ export interface GlitterProps {
   iterations?: number;
   onAnimationStart?: () => void;
   onAnimationComplete?: () => void;
+  /** Test ID for e2e testing */
+  testID?: string;
+  /** Accessibility label for screen readers */
+  accessibilityLabel?: string;
+  /** Whether the component is accessible (default: true) */
+  accessible?: boolean;
 }
 
 function generateGlitterOpacities(count: number, peak: number = 1): number[] {
@@ -124,6 +130,9 @@ function GlitterComponent({
   iterations = -1,
   onAnimationStart,
   onAnimationComplete,
+  testID,
+  accessibilityLabel,
+  accessible = true,
 }: GlitterProps): ReactElement {
   const animatedValue = useRef(new Animated.Value(0)).current;
   const [containerWidth, setContainerWidth] = useState(0);
@@ -332,7 +341,13 @@ function GlitterComponent({
   );
 
   return (
-    <View style={[styles.container, style]} onLayout={onLayout}>
+    <View
+      style={[styles.container, style]}
+      onLayout={onLayout}
+      testID={testID}
+      accessibilityLabel={accessibilityLabel}
+      accessible={accessible}
+    >
       {children}
       {active && containerWidth > 0 && containerHeight > 0 && (
         <Animated.View style={shimmerContainerStyle} pointerEvents="none">

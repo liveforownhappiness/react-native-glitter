@@ -83,4 +83,58 @@ describe('Glitter', () => {
     );
     expect(element).toBeTruthy();
   });
+
+  it('should accept accessibility props', () => {
+    const element = (
+      <Glitter
+        testID="glitter-component"
+        accessibilityLabel="Loading shimmer effect"
+        accessible={true}
+      >
+        <View>
+          <Text>Test Content</Text>
+        </View>
+      </Glitter>
+    );
+    expect(element).toBeTruthy();
+  });
+
+  it('should accept animation callback props', () => {
+    const onStart = jest.fn();
+    const onComplete = jest.fn();
+    const element = (
+      <Glitter
+        iterations={3}
+        onAnimationStart={onStart}
+        onAnimationComplete={onComplete}
+      >
+        <View>
+          <Text>Test Content</Text>
+        </View>
+      </Glitter>
+    );
+    expect(element).toBeTruthy();
+  });
+
+  it('should accept direction prop', () => {
+    const element = (
+      <Glitter direction="right-to-left">
+        <View>
+          <Text>Test Content</Text>
+        </View>
+      </Glitter>
+    );
+    expect(element).toBeTruthy();
+  });
+
+  it('should accept mode and position props', () => {
+    const element = (
+      <Glitter mode="shrink" position="bottom">
+        <View>
+          <Text>Test Content</Text>
+        </View>
+      </Glitter>
+    );
+    expect(element).toBeTruthy();
+  });
 });

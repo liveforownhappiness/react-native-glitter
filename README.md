@@ -167,6 +167,9 @@ function ControlledGlitter() {
 | `iterations` | `number` | `-1` | Number of animation cycles (-1 for infinite) |
 | `onAnimationStart` | `() => void` | - | Callback when animation starts |
 | `onAnimationComplete` | `() => void` | - | Callback when all iterations complete |
+| `testID` | `string` | - | Test ID for e2e testing |
+| `accessibilityLabel` | `string` | - | Accessibility label for screen readers |
+| `accessible` | `boolean` | `true` | Whether the component is accessible |
 
 ## Examples
 
