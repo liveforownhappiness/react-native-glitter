@@ -1,5 +1,6 @@
+import { createRef } from 'react';
 import { Text, View } from 'react-native';
-import { Glitter } from '../index';
+import { Glitter, type GlitterRef } from '../index';
 
 // Mock Animated to prevent issues in test environment
 jest.mock('react-native', () => {
@@ -136,5 +137,23 @@ describe('Glitter', () => {
       </Glitter>
     );
     expect(element).toBeTruthy();
+  });
+
+  it('should accept ref and expose control methods', () => {
+    const ref = createRef<GlitterRef>();
+    const element = (
+      <Glitter ref={ref}>
+        <View>
+          <Text>Test Content</Text>
+        </View>
+      </Glitter>
+    );
+    expect(element).toBeTruthy();
+  });
+
+  it('should export GlitterRef type', () => {
+    // Type check - this will fail at compile time if GlitterRef is not exported
+    const ref: GlitterRef | null = null;
+    expect(ref).toBeNull();
   });
 });

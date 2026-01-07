@@ -264,6 +264,44 @@ function ControlledGlitter() {
 </Glitter>
 ```
 
+## Ref API
+
+You can control the animation programmatically using a ref:
+
+```tsx
+import { useRef } from 'react';
+import { Glitter, type GlitterRef } from 'react-native-glitter';
+
+function MyComponent() {
+  const glitterRef = useRef<GlitterRef>(null);
+
+  const handleStart = () => glitterRef.current?.start();
+  const handleStop = () => glitterRef.current?.stop();
+  const handleRestart = () => glitterRef.current?.restart();
+  const checkStatus = () => console.log(glitterRef.current?.isAnimating());
+
+  return (
+    <>
+      <Glitter ref={glitterRef} active={false}>
+        <View style={styles.box} />
+      </Glitter>
+      <Button title="Start" onPress={handleStart} />
+      <Button title="Stop" onPress={handleStop} />
+      <Button title="Restart" onPress={handleRestart} />
+    </>
+  );
+}
+```
+
+### Ref Methods
+
+| Method | Return | Description |
+|--------|--------|-------------|
+| `start()` | `void` | Start the shimmer animation |
+| `stop()` | `void` | Stop the shimmer animation |
+| `restart()` | `void` | Restart the animation from the beginning |
+| `isAnimating()` | `boolean` | Check if animation is currently running |
+
 ## TypeScript
 
 This library is written in TypeScript and includes type definitions:
@@ -272,6 +310,7 @@ This library is written in TypeScript and includes type definitions:
 import {
   Glitter,
   type GlitterProps,
+  type GlitterRef,
   type GlitterMode,
   type GlitterPosition,
   type GlitterDirection,

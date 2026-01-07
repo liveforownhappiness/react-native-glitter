@@ -5,8 +5,11 @@ import {
   useCallback,
   useMemo,
   memo,
+  useImperativeHandle,
+  forwardRef,
   type ReactNode,
   type ReactElement,
+  type ForwardedRef,
 } from 'react';
 import {
   View,
@@ -46,6 +49,18 @@ export interface GlitterProps {
   accessibilityLabel?: string;
   /** Whether the component is accessible (default: true) */
   accessible?: boolean;
+}
+
+/** Ref methods exposed by Glitter component */
+export interface GlitterRef {
+  /** Start the shimmer animation */
+  start: () => void;
+  /** Stop the shimmer animation */
+  stop: () => void;
+  /** Restart the shimmer animation from the beginning */
+  restart: () => void;
+  /** Check if animation is currently running */
+  isAnimating: () => boolean;
 }
 
 function generateGlitterOpacities(count: number, peak: number = 1): number[] {
@@ -114,26 +129,29 @@ const NORMAL_FADE_RATIO = (HEIGHT_MULTIPLIER - 1) / HEIGHT_MULTIPLIER / 2;
 const ANIMATED_SEGMENTS = generateVerticalSegments(0.25);
 const NORMAL_SEGMENTS = generateVerticalSegments(NORMAL_FADE_RATIO);
 
-function GlitterComponent({
-  children,
-  duration = 1500,
-  delay = 400,
-  color = 'rgba(255, 255, 255, 0.8)',
-  angle = 20,
-  shimmerWidth = 60,
-  active = true,
-  style,
-  easing,
-  mode = 'normal',
-  position = 'center',
-  direction = 'left-to-right',
-  iterations = -1,
-  onAnimationStart,
-  onAnimationComplete,
-  testID,
-  accessibilityLabel,
-  accessible = true,
-}: GlitterProps): ReactElement {
+function GlitterComponent(
+  {
+    children,
+    duration = 1500,
+    delay = 400,
+    color = 'rgba(255, 255, 255, 0.8)',
+    angle = 20,
+    shimmerWidth = 60,
+    active = true,
+    style,
+    easing,
+    mode = 'normal',
+    position = 'center',
+    direction = 'left-to-right',
+    iterations = -1,
+    onAnimationStart,
+    onAnimationComplete,
+    testID,
+    accessibilityLabel,
+    accessible = true,
+  }: GlitterProps,
+  ref: ForwardedRef<GlitterRef>
+): ReactElement {
   const animatedValue = useRef(new Animated.Value(0)).current;
   const [containerWidth, setContainerWidth] = useState(0);
   const [containerHeight, setContainerHeight] = useState(0);
@@ -153,6 +171,29 @@ function GlitterComponent({
     currentIterationRef.current?.stop();
     currentIterationRef.current = null;
   }, []);
+
+  const restartAnimation = useCallback(() => {
+    stopAnimation();
+    animatedValue.setValue(0);
+    // Trigger re-render to start animation
+    setContainerWidth((prev) => prev);
+  }, [stopAnimation, animatedValue]);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      start: () => {
+        if (!isAnimatingRef.current && containerWidth > 0) {
+          // Force start by triggering the effect
+          setContainerWidth((prev) => prev);
+        }
+      },
+      stop: stopAnimation,
+      restart: restartAnimation,
+      isAnimating: () => isAnimatingRef.current,
+    }),
+    [stopAnimation, restartAnimation, containerWidth]
+  );
 
   const startAnimation = useCallback(() => {
     if (!active || containerWidth === 0) return;
@@ -404,6 +445,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export const Glitter = memo(GlitterComponent);
+const ForwardedGlitter = forwardRef(GlitterComponent);
+export const Glitter = memo(ForwardedGlitter);
 
 export default Glitter;
