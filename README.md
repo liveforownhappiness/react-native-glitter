@@ -170,6 +170,7 @@ function ControlledGlitter() {
 | `testID` | `string` | - | Test ID for e2e testing |
 | `accessibilityLabel` | `string` | - | Accessibility label for screen readers |
 | `accessible` | `boolean` | `true` | Whether the component is accessible |
+| `respectReduceMotion` | `boolean` | `true` | Whether to respect the system's "Reduce Motion" setting |
 
 ## Examples
 

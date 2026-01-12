@@ -16,6 +16,7 @@ import {
   Animated,
   StyleSheet,
   Easing,
+  AccessibilityInfo,
   type LayoutChangeEvent,
   type StyleProp,
   type ViewStyle,
@@ -174,6 +175,13 @@ export interface GlitterProps {
    * @default true
    */
   accessible?: boolean;
+
+  /**
+   * Whether to respect the system's "Reduce Motion" accessibility setting.
+   * When enabled and the user has reduced motion enabled, the shimmer animation will be disabled.
+   * @default true
+   */
+  respectReduceMotion?: boolean;
 }
 
 /**
@@ -306,12 +314,48 @@ function GlitterComponent(
     testID,
     accessibilityLabel,
     accessible = true,
+    respectReduceMotion = true,
   }: GlitterProps,
   ref: ForwardedRef<GlitterRef>
 ): ReactElement {
   const animatedValue = useRef(new Animated.Value(0)).current;
   const [containerWidth, setContainerWidth] = useState(0);
   const [containerHeight, setContainerHeight] = useState(0);
+  const [reduceMotionEnabled, setReduceMotionEnabled] = useState(false);
+
+  // Detect system reduce motion preference
+  useEffect(() => {
+    if (!respectReduceMotion) {
+      setReduceMotionEnabled(false);
+      return;
+    }
+
+    let isMounted = true;
+
+    AccessibilityInfo.isReduceMotionEnabled()
+      .then((enabled) => {
+        if (isMounted) {
+          setReduceMotionEnabled(enabled);
+        }
+      })
+      .catch(() => {
+        // Ignore errors (e.g., on web where this might not be supported)
+      });
+
+    const subscription = AccessibilityInfo.addEventListener(
+      'reduceMotionChanged',
+      (enabled) => {
+        if (isMounted) {
+          setReduceMotionEnabled(enabled);
+        }
+      }
+    );
+
+    return () => {
+      isMounted = false;
+      subscription.remove();
+    };
+  }, [respectReduceMotion]);
   const animationRef = useRef<ReturnType<typeof Animated.loop> | null>(null);
   const currentIterationRef = useRef<ReturnType<
     typeof Animated.sequence
@@ -353,7 +397,7 @@ function GlitterComponent(
   );
 
   const startAnimation = useCallback(() => {
-    if (!active || containerWidth === 0) return;
+    if (!active || containerWidth === 0 || reduceMotionEnabled) return;
 
     stopAnimation();
     animatedValue.setValue(0);
@@ -411,6 +455,7 @@ function GlitterComponent(
     onAnimationStart,
     onAnimationComplete,
     stopAnimation,
+    reduceMotionEnabled,
   ]);
 
   useEffect(() => {
@@ -547,32 +592,35 @@ function GlitterComponent(
       accessible={accessible}
     >
       {children}
-      {active && containerWidth > 0 && containerHeight > 0 && (
-        <Animated.View style={shimmerContainerStyle} pointerEvents="none">
-          <View style={rotationWrapperStyle}>
-            {shimmerLayers.map((layer, layerIndex) => (
-              <Animated.View
-                key={layerIndex}
-                style={getShimmerLineStyle(layer.position)}
-              >
-                {segments.map((segment, vIndex) => (
-                  <View
-                    key={vIndex}
-                    style={[
-                      styles.segment,
-                      {
-                        height: lineHeight * segment.heightRatio,
-                        backgroundColor: color,
-                        opacity: layer.opacity * segment.opacity,
-                      },
-                    ]}
-                  />
-                ))}
-              </Animated.View>
-            ))}
-          </View>
-        </Animated.View>
-      )}
+      {active &&
+        !reduceMotionEnabled &&
+        containerWidth > 0 &&
+        containerHeight > 0 && (
+          <Animated.View style={shimmerContainerStyle} pointerEvents="none">
+            <View style={rotationWrapperStyle}>
+              {shimmerLayers.map((layer, layerIndex) => (
+                <Animated.View
+                  key={layerIndex}
+                  style={getShimmerLineStyle(layer.position)}
+                >
+                  {segments.map((segment, vIndex) => (
+                    <View
+                      key={vIndex}
+                      style={[
+                        styles.segment,
+                        {
+                          height: lineHeight * segment.heightRatio,
+                          backgroundColor: color,
+                          opacity: layer.opacity * segment.opacity,
+                        },
+                      ]}
+                    />
+                  ))}
+                </Animated.View>
+              ))}
+            </View>
+          </Animated.View>
+        )}
     </View>
   );
 }
