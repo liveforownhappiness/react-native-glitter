@@ -1,15 +1,32 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Text,
   View,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  AccessibilityInfo,
 } from 'react-native';
 import { Glitter } from 'react-native-glitter';
 
 export default function App() {
   const [active, setActive] = useState(true);
+  const [respectReduceMotion, setRespectReduceMotion] = useState(true);
+  const [systemReduceMotion, setSystemReduceMotion] = useState(false);
+
+  // Detect system reduce motion setting
+  useEffect(() => {
+    AccessibilityInfo.isReduceMotionEnabled()
+      .then(setSystemReduceMotion)
+      .catch(() => {});
+
+    const subscription = AccessibilityInfo.addEventListener(
+      'reduceMotionChanged',
+      setSystemReduceMotion
+    );
+
+    return () => subscription.remove();
+  }, []);
 
   return (
     <ScrollView
@@ -202,6 +219,64 @@ export default function App() {
         </View>
       </View>
 
+      {/* Accessibility - Reduce Motion */}
+      <Text style={styles.sectionTitle}>♿ Accessibility</Text>
+      <View style={styles.accessibilityContainer}>
+        <View style={styles.accessibilityInfo}>
+          <Text style={styles.accessibilityLabel}>System "Reduce Motion":</Text>
+          <Text
+            style={[
+              styles.accessibilityValue,
+              systemReduceMotion ? styles.valueOn : styles.valueOff,
+            ]}
+          >
+            {systemReduceMotion ? 'ON' : 'OFF'}
+          </Text>
+        </View>
+        <Text style={styles.accessibilityHint}>
+          {systemReduceMotion
+            ? '💡 Go to Settings → Accessibility → Motion to turn off'
+            : '💡 Go to Settings → Accessibility → Motion to turn on'}
+        </Text>
+      </View>
+
+      <TouchableOpacity
+        style={[
+          styles.reduceMotionButton,
+          respectReduceMotion
+            ? styles.reduceMotionButtonOn
+            : styles.reduceMotionButtonOff,
+        ]}
+        onPress={() => setRespectReduceMotion(!respectReduceMotion)}
+      >
+        <Text style={styles.reduceMotionButtonText}>
+          respectReduceMotion: {respectReduceMotion ? 'true' : 'false'}
+        </Text>
+      </TouchableOpacity>
+
+      <View style={styles.modeRow}>
+        <View style={styles.accessibilityDemoItem}>
+          <Text style={styles.modeLabel}>Respects Setting</Text>
+          <Glitter active={active} respectReduceMotion={respectReduceMotion}>
+            <View style={styles.accessibilityBox}>
+              <Text style={styles.accessibilityBoxText}>
+                {systemReduceMotion && respectReduceMotion
+                  ? '🚫 No Animation'
+                  : '✨ Animating'}
+              </Text>
+            </View>
+          </Glitter>
+        </View>
+        <View style={styles.accessibilityDemoItem}>
+          <Text style={styles.modeLabel}>Always Animates</Text>
+          <Glitter active={active} respectReduceMotion={false}>
+            <View style={styles.accessibilityBox}>
+              <Text style={styles.accessibilityBoxText}>✨ Always On</Text>
+            </View>
+          </Glitter>
+        </View>
+      </View>
+
       <View style={styles.footer} />
     </ScrollView>
   );
@@ -390,6 +465,78 @@ const styles = StyleSheet.create({
     height: 80,
     backgroundColor: '#2d2d44',
     borderRadius: 10,
+  },
+  accessibilityContainer: {
+    backgroundColor: '#2d2d44',
+    borderRadius: 12,
+    padding: 15,
+    marginBottom: 15,
+  },
+  accessibilityInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  accessibilityLabel: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  accessibilityValue: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 6,
+    overflow: 'hidden',
+  },
+  valueOn: {
+    backgroundColor: '#51cf66',
+    color: '#ffffff',
+  },
+  valueOff: {
+    backgroundColor: '#666',
+    color: '#ffffff',
+  },
+  accessibilityHint: {
+    color: '#a0a0a0',
+    fontSize: 12,
+  },
+  reduceMotionButton: {
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 15,
+    alignItems: 'center',
+  },
+  reduceMotionButtonOn: {
+    backgroundColor: '#00b894',
+  },
+  reduceMotionButtonOff: {
+    backgroundColor: '#636e72',
+  },
+  reduceMotionButtonText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  accessibilityDemoItem: {
+    alignItems: 'center',
+    flex: 1,
+    marginHorizontal: 5,
+  },
+  accessibilityBox: {
+    width: '100%',
+    height: 80,
+    backgroundColor: '#2d2d44',
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  accessibilityBoxText: {
+    color: '#ffffff',
+    fontSize: 12,
+    fontWeight: '500',
   },
   footer: {
     height: 50,
