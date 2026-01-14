@@ -390,6 +390,38 @@ describe('Glitter', () => {
       );
       expect(element).toBeTruthy();
     });
+
+    it('should accept respectReduceMotion=true (default)', () => {
+      const element = (
+        <Glitter respectReduceMotion={true}>
+          <View />
+        </Glitter>
+      );
+      expect(element).toBeTruthy();
+    });
+
+    it('should accept respectReduceMotion=false', () => {
+      const element = (
+        <Glitter respectReduceMotion={false}>
+          <View />
+        </Glitter>
+      );
+      expect(element).toBeTruthy();
+    });
+
+    it('should work with respectReduceMotion and other accessibility props', () => {
+      const element = (
+        <Glitter
+          respectReduceMotion={true}
+          accessible={true}
+          accessibilityLabel="Shimmer loading effect"
+          testID="shimmer-test"
+        >
+          <View />
+        </Glitter>
+      );
+      expect(element).toBeTruthy();
+    });
   });
 
   describe('Ref API', () => {
