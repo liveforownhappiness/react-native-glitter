@@ -518,8 +518,10 @@ function GlitterComponent(
     return position === 'top' ? -halfHeight : halfHeight;
   }, [mode, position, halfHeight]);
 
+  // Optimized: reduced layer count for better performance
+  // shimmerWidth=60 → 12 layers (was 20), shimmerWidth=100 → 14 layers (was 33)
   const layerCount = useMemo(
-    () => Math.max(11, Math.round(shimmerWidth / 3)),
+    () => Math.max(7, Math.round(shimmerWidth / 5)),
     [shimmerWidth]
   );
 
@@ -544,6 +546,17 @@ function GlitterComponent(
 
   const isAnimated = mode !== 'normal';
   const segments = isAnimated ? ANIMATED_SEGMENTS : NORMAL_SEGMENTS;
+
+  // Memoize segment styles to avoid creating new objects on every render
+  const segmentStyles = useMemo(
+    () =>
+      segments.map((segment) => ({
+        height: lineHeight * segment.heightRatio,
+        backgroundColor: color,
+        baseOpacity: segment.opacity,
+      })),
+    [segments, lineHeight, color]
+  );
 
   const shimmerContainerStyle = useMemo(
     () => [styles.shimmerContainer, { transform: [{ translateX }] }],
@@ -603,15 +616,15 @@ function GlitterComponent(
                   key={layerIndex}
                   style={getShimmerLineStyle(layer.position)}
                 >
-                  {segments.map((segment, vIndex) => (
+                  {segmentStyles.map((segmentStyle, vIndex) => (
                     <View
                       key={vIndex}
                       style={[
                         styles.segment,
                         {
-                          height: lineHeight * segment.heightRatio,
-                          backgroundColor: color,
-                          opacity: layer.opacity * segment.opacity,
+                          height: segmentStyle.height,
+                          backgroundColor: segmentStyle.backgroundColor,
+                          opacity: layer.opacity * segmentStyle.baseOpacity,
                         },
                       ]}
                     />
