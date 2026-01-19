@@ -165,6 +165,33 @@ describe('Glitter', () => {
       );
       expect(element).toBeTruthy();
     });
+
+    it('should accept initialDelay prop', () => {
+      const element = (
+        <Glitter initialDelay={500}>
+          <View />
+        </Glitter>
+      );
+      expect(element).toBeTruthy();
+    });
+
+    it('should accept initialDelay=0 (default)', () => {
+      const element = (
+        <Glitter initialDelay={0}>
+          <View />
+        </Glitter>
+      );
+      expect(element).toBeTruthy();
+    });
+
+    it('should work with initialDelay and other animation props', () => {
+      const element = (
+        <Glitter initialDelay={1000} duration={2000} delay={500} iterations={3}>
+          <View />
+        </Glitter>
+      );
+      expect(element).toBeTruthy();
+    });
   });
 
   describe('Appearance Props', () => {

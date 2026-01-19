@@ -80,6 +80,14 @@ export interface GlitterProps {
   delay?: number;
 
   /**
+   * Initial delay before the first animation cycle starts in milliseconds.
+   * Useful for staggering multiple shimmer effects.
+   * @default 0
+   * @example 500 // Wait 500ms before starting the first animation
+   */
+  initialDelay?: number;
+
+  /**
    * Color of the shimmer effect.
    * Supports any valid React Native color format (rgba, hex, rgb, named colors).
    * @default 'rgba(255, 255, 255, 0.8)'
@@ -309,6 +317,7 @@ function GlitterComponent(
     position = 'center',
     direction = 'left-to-right',
     iterations = -1,
+    initialDelay = 0,
     onAnimationStart,
     onAnimationComplete,
     testID,
@@ -360,6 +369,7 @@ function GlitterComponent(
   const currentIterationRef = useRef<ReturnType<
     typeof Animated.sequence
   > | null>(null);
+  const initialDelayRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const iterationCount = useRef(0);
   const isAnimatingRef = useRef(false);
 
@@ -367,6 +377,10 @@ function GlitterComponent(
 
   const stopAnimation = useCallback(() => {
     isAnimatingRef.current = false;
+    if (initialDelayRef.current) {
+      clearTimeout(initialDelayRef.current);
+      initialDelayRef.current = null;
+    }
     animationRef.current?.stop();
     animationRef.current = null;
     currentIterationRef.current?.stop();
@@ -404,8 +418,6 @@ function GlitterComponent(
     iterationCount.current = 0;
     isAnimatingRef.current = true;
 
-    onAnimationStart?.();
-
     const createSingleIteration = () =>
       Animated.sequence([
         Animated.timing(animatedValue, {
@@ -437,17 +449,31 @@ function GlitterComponent(
       );
     };
 
-    if (iterations === -1) {
-      animationRef.current = Animated.loop(createSingleIteration());
-      animationRef.current.start();
+    const beginAnimation = () => {
+      if (!isAnimatingRef.current) return;
+
+      onAnimationStart?.();
+
+      if (iterations === -1) {
+        animationRef.current = Animated.loop(createSingleIteration());
+        animationRef.current.start();
+      } else {
+        runIteration();
+      }
+    };
+
+    // Apply initial delay before first animation
+    if (initialDelay > 0) {
+      initialDelayRef.current = setTimeout(beginAnimation, initialDelay);
     } else {
-      runIteration();
+      beginAnimation();
     }
   }, [
     active,
     containerWidth,
     duration,
     delay,
+    initialDelay,
     animatedValue,
     easing,
     defaultEasing,

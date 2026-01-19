@@ -155,6 +155,7 @@ function ControlledGlitter() {
 | `children` | `ReactNode` | **required** | The content to apply the shimmer effect to |
 | `duration` | `number` | `1500` | Duration of one shimmer animation cycle in milliseconds |
 | `delay` | `number` | `400` | Delay between animation cycles in milliseconds |
+| `initialDelay` | `number` | `0` | Initial delay before the first animation starts (useful for staggering) |
 | `color` | `string` | `'rgba(255, 255, 255, 0.8)'` | Color of the shimmer effect |
 | `angle` | `number` | `20` | Angle of the shimmer in degrees |
 | `shimmerWidth` | `number` | `60` | Width of the shimmer band in pixels |
