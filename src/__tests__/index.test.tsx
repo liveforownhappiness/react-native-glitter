@@ -239,6 +239,33 @@ describe('Glitter', () => {
       );
       expect(element).toBeTruthy();
     });
+
+    it('should accept opacity prop', () => {
+      const element = (
+        <Glitter opacity={0.5}>
+          <View />
+        </Glitter>
+      );
+      expect(element).toBeTruthy();
+    });
+
+    it('should accept opacity=1 (default)', () => {
+      const element = (
+        <Glitter opacity={1}>
+          <View />
+        </Glitter>
+      );
+      expect(element).toBeTruthy();
+    });
+
+    it('should accept opacity=0', () => {
+      const element = (
+        <Glitter opacity={0}>
+          <View />
+        </Glitter>
+      );
+      expect(element).toBeTruthy();
+    });
   });
 
   describe('Mode Props', () => {

@@ -109,6 +109,14 @@ export interface GlitterProps {
   shimmerWidth?: number;
 
   /**
+   * Overall opacity of the shimmer effect.
+   * Value between 0 and 1.
+   * @default 1
+   * @example 0.5 // 50% opacity shimmer
+   */
+  opacity?: number;
+
+  /**
    * Whether the animation is active.
    * Set to false to pause the animation.
    * @default true
@@ -310,6 +318,7 @@ function GlitterComponent(
     color = 'rgba(255, 255, 255, 0.8)',
     angle = 20,
     shimmerWidth = 60,
+    opacity: shimmerOpacity = 1,
     active = true,
     style,
     easing,
@@ -585,8 +594,11 @@ function GlitterComponent(
   );
 
   const shimmerContainerStyle = useMemo(
-    () => [styles.shimmerContainer, { transform: [{ translateX }] }],
-    [translateX]
+    () => [
+      styles.shimmerContainer,
+      { transform: [{ translateX }], opacity: shimmerOpacity },
+    ],
+    [translateX, shimmerOpacity]
   );
 
   const rotationWrapperStyle = useMemo(

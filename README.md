@@ -17,10 +17,11 @@ Works with both **React Native CLI** and **Expo** projects - no native dependenc
 
 - 🚀 **Zero native dependencies** - Pure JavaScript/TypeScript implementation
 - 📱 **Cross-platform** - Works on iOS, Android, and Web
-- 🎨 **Customizable** - Control color, speed, angle, and more
+- 🎨 **Customizable** - Control color, speed, angle, opacity, and more
 - ⚡ **Performant** - Uses native driver for smooth 60fps animations
 - 🔧 **TypeScript** - Full TypeScript support with type definitions
 - ✨ **Animation Modes** - Normal, expand, and shrink effects
+- ♿ **Accessible** - Respects system "Reduce Motion" setting
 
 ## Installation
 
@@ -159,6 +160,7 @@ function ControlledGlitter() {
 | `color` | `string` | `'rgba(255, 255, 255, 0.8)'` | Color of the shimmer effect |
 | `angle` | `number` | `20` | Angle of the shimmer in degrees |
 | `shimmerWidth` | `number` | `60` | Width of the shimmer band in pixels |
+| `opacity` | `number` | `1` | Overall opacity of the shimmer effect (0-1) |
 | `active` | `boolean` | `true` | Whether the animation is active |
 | `style` | `ViewStyle` | - | Additional styles for the container |
 | `easing` | `(value: number) => number` | - | Custom easing function for the animation |
