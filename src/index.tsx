@@ -17,9 +17,11 @@ import {
   StyleSheet,
   Easing,
   AccessibilityInfo,
+  AppState,
   type LayoutChangeEvent,
   type StyleProp,
   type ViewStyle,
+  type AppStateStatus,
 } from 'react-native';
 
 /**
@@ -198,6 +200,13 @@ export interface GlitterProps {
    * @default true
    */
   respectReduceMotion?: boolean;
+
+  /**
+   * Whether to pause the animation when the app goes to background.
+   * Helps save battery by stopping unnecessary animations.
+   * @default true
+   */
+  pauseOnBackground?: boolean;
 }
 
 /**
@@ -333,6 +342,7 @@ function GlitterComponent(
     accessibilityLabel,
     accessible = true,
     respectReduceMotion = true,
+    pauseOnBackground = true,
   }: GlitterProps,
   ref: ForwardedRef<GlitterRef>
 ): ReactElement {
@@ -340,6 +350,28 @@ function GlitterComponent(
   const [containerWidth, setContainerWidth] = useState(0);
   const [containerHeight, setContainerHeight] = useState(0);
   const [reduceMotionEnabled, setReduceMotionEnabled] = useState(false);
+  const [isAppActive, setIsAppActive] = useState(true);
+
+  // Detect app state changes (background/foreground)
+  useEffect(() => {
+    if (!pauseOnBackground) {
+      setIsAppActive(true);
+      return;
+    }
+
+    const handleAppStateChange = (nextAppState: AppStateStatus) => {
+      setIsAppActive(nextAppState === 'active');
+    };
+
+    const subscription = AppState.addEventListener(
+      'change',
+      handleAppStateChange
+    );
+
+    return () => {
+      subscription.remove();
+    };
+  }, [pauseOnBackground]);
 
   // Detect system reduce motion preference
   useEffect(() => {
@@ -420,7 +452,8 @@ function GlitterComponent(
   );
 
   const startAnimation = useCallback(() => {
-    if (!active || containerWidth === 0 || reduceMotionEnabled) return;
+    if (!active || containerWidth === 0 || reduceMotionEnabled || !isAppActive)
+      return;
 
     stopAnimation();
     animatedValue.setValue(0);
@@ -491,6 +524,7 @@ function GlitterComponent(
     onAnimationComplete,
     stopAnimation,
     reduceMotionEnabled,
+    isAppActive,
   ]);
 
   useEffect(() => {
@@ -645,6 +679,7 @@ function GlitterComponent(
       {children}
       {active &&
         !reduceMotionEnabled &&
+        isAppActive &&
         containerWidth > 0 &&
         containerHeight > 0 && (
           <Animated.View style={shimmerContainerStyle} pointerEvents="none">

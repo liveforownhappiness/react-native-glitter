@@ -476,6 +476,24 @@ describe('Glitter', () => {
       );
       expect(element).toBeTruthy();
     });
+
+    it('should accept pauseOnBackground=true (default)', () => {
+      const element = (
+        <Glitter pauseOnBackground={true}>
+          <View />
+        </Glitter>
+      );
+      expect(element).toBeTruthy();
+    });
+
+    it('should accept pauseOnBackground=false', () => {
+      const element = (
+        <Glitter pauseOnBackground={false}>
+          <View />
+        </Glitter>
+      );
+      expect(element).toBeTruthy();
+    });
   });
 
   describe('Ref API', () => {

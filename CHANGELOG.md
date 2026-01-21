@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `initialDelay` prop - Add delay before the first animation starts (useful for staggered effects)
 - `respectReduceMotion` prop - Respect system's "Reduce Motion" accessibility setting
 - `opacity` prop - Control the overall opacity of the shimmer effect
+- `pauseOnBackground` prop - Pause animation when app goes to background (battery saving)
 - Accessibility demo section in example app
 
 ### Changed

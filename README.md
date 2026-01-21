@@ -174,6 +174,7 @@ function ControlledGlitter() {
 | `accessibilityLabel` | `string` | - | Accessibility label for screen readers |
 | `accessible` | `boolean` | `true` | Whether the component is accessible |
 | `respectReduceMotion` | `boolean` | `true` | Whether to respect the system's "Reduce Motion" setting |
+| `pauseOnBackground` | `boolean` | `true` | Whether to pause animation when app goes to background |
 
 ## Examples
 
