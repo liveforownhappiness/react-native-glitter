@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `respectReduceMotion` prop - Respect system's "Reduce Motion" accessibility setting
 - `opacity` prop - Control the overall opacity of the shimmer effect
 - `pauseOnBackground` prop - Pause animation when app goes to background (battery saving)
+- `onIterationComplete` callback - Called when each iteration completes with iteration number
 - Accessibility demo section in example app
 
 ### Changed

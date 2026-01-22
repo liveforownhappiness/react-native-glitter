@@ -178,6 +178,14 @@ export interface GlitterProps {
   onAnimationComplete?: () => void;
 
   /**
+   * Callback fired when each iteration completes.
+   * Receives the current iteration number (1-indexed).
+   * @param iteration - The iteration number that just completed (starts at 1)
+   * @example (iteration) => console.log(`Iteration ${iteration} completed`)
+   */
+  onIterationComplete?: (iteration: number) => void;
+
+  /**
    * Test ID for e2e testing frameworks like Detox.
    */
   testID?: string;
@@ -338,6 +346,7 @@ function GlitterComponent(
     initialDelay = 0,
     onAnimationStart,
     onAnimationComplete,
+    onIterationComplete,
     testID,
     accessibilityLabel,
     accessible = true,
@@ -480,6 +489,8 @@ function GlitterComponent(
         ({ finished }: { finished: boolean }) => {
           if (finished && isAnimatingRef.current) {
             iterationCount.current += 1;
+            onIterationComplete?.(iterationCount.current);
+
             if (iterations === -1 || iterationCount.current < iterations) {
               runIteration();
             } else {
@@ -495,13 +506,7 @@ function GlitterComponent(
       if (!isAnimatingRef.current) return;
 
       onAnimationStart?.();
-
-      if (iterations === -1) {
-        animationRef.current = Animated.loop(createSingleIteration());
-        animationRef.current.start();
-      } else {
-        runIteration();
-      }
+      runIteration();
     };
 
     // Apply initial delay before first animation
@@ -522,6 +527,7 @@ function GlitterComponent(
     iterations,
     onAnimationStart,
     onAnimationComplete,
+    onIterationComplete,
     stopAnimation,
     reduceMotionEnabled,
     isAppActive,

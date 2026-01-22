@@ -393,6 +393,33 @@ describe('Glitter', () => {
       );
       expect(element).toBeTruthy();
     });
+
+    it('should accept onIterationComplete callback', () => {
+      const onIterationComplete = jest.fn();
+      const element = (
+        <Glitter iterations={5} onIterationComplete={onIterationComplete}>
+          <View />
+        </Glitter>
+      );
+      expect(element).toBeTruthy();
+    });
+
+    it('should work with all animation callbacks together', () => {
+      const onStart = jest.fn();
+      const onComplete = jest.fn();
+      const onIterationComplete = jest.fn();
+      const element = (
+        <Glitter
+          iterations={3}
+          onAnimationStart={onStart}
+          onAnimationComplete={onComplete}
+          onIterationComplete={onIterationComplete}
+        >
+          <View />
+        </Glitter>
+      );
+      expect(element).toBeTruthy();
+    });
   });
 
   describe('Accessibility Props', () => {
