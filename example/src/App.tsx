@@ -173,6 +173,23 @@ export default function App() {
         </View>
       </View>
 
+      {/* Shimmer Directions */}
+      <Text style={styles.sectionTitle}>Shimmer Directions</Text>
+      <View style={styles.modeRow}>
+        <View style={styles.modeItem}>
+          <Text style={styles.modeLabel}>Left → Right</Text>
+          <Glitter active={active} direction="left-to-right">
+            <View style={styles.modeBox} />
+          </Glitter>
+        </View>
+        <View style={styles.modeItem}>
+          <Text style={styles.modeLabel}>Right → Left</Text>
+          <Glitter active={active} direction="right-to-left">
+            <View style={styles.modeBox} />
+          </Glitter>
+        </View>
+      </View>
+
       {/* Expand Positions */}
       <Text style={styles.sectionTitle}>Expand Positions</Text>
       <View style={styles.modeRow}>
