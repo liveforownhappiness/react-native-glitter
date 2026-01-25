@@ -87,6 +87,29 @@ export default function App() {
         </View>
       </View>
 
+      {/* Staggered Animation Example */}
+      <Text style={styles.sectionTitle}>Staggered Animation</Text>
+      <Text style={styles.staggeredDescription}>
+        Using initialDelay to create a wave effect
+      </Text>
+      <View style={styles.staggeredContainer}>
+        <Glitter active={active} initialDelay={0}>
+          <View style={styles.staggeredBox} />
+        </Glitter>
+        <Glitter active={active} initialDelay={200}>
+          <View style={styles.staggeredBox} />
+        </Glitter>
+        <Glitter active={active} initialDelay={400}>
+          <View style={styles.staggeredBox} />
+        </Glitter>
+        <Glitter active={active} initialDelay={600}>
+          <View style={styles.staggeredBox} />
+        </Glitter>
+        <Glitter active={active} initialDelay={800}>
+          <View style={styles.staggeredBox} />
+        </Glitter>
+      </View>
+
       {/* Different Colors Example */}
       <Text style={styles.sectionTitle}>Custom Colors</Text>
       <View style={styles.colorRow}>
@@ -554,6 +577,24 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 12,
     fontWeight: '500',
+  },
+  staggeredContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  staggeredBox: {
+    flex: 1,
+    height: 60,
+    backgroundColor: '#2d2d44',
+    borderRadius: 8,
+    marginHorizontal: 4,
+  },
+  staggeredDescription: {
+    color: '#a0a0a0',
+    fontSize: 12,
+    marginBottom: 10,
+    fontStyle: 'italic',
   },
   footer: {
     height: 50,
