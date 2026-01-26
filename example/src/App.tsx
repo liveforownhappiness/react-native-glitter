@@ -110,6 +110,29 @@ export default function App() {
         </Glitter>
       </View>
 
+      {/* Opacity Example */}
+      <Text style={styles.sectionTitle}>Shimmer Opacity</Text>
+      <View style={styles.opacityRow}>
+        <View style={styles.opacityItem}>
+          <Text style={styles.opacityLabel}>100%</Text>
+          <Glitter active={active} opacity={1}>
+            <View style={styles.opacityBox} />
+          </Glitter>
+        </View>
+        <View style={styles.opacityItem}>
+          <Text style={styles.opacityLabel}>50%</Text>
+          <Glitter active={active} opacity={0.5}>
+            <View style={styles.opacityBox} />
+          </Glitter>
+        </View>
+        <View style={styles.opacityItem}>
+          <Text style={styles.opacityLabel}>25%</Text>
+          <Glitter active={active} opacity={0.25}>
+            <View style={styles.opacityBox} />
+          </Glitter>
+        </View>
+      </View>
+
       {/* Different Colors Example */}
       <Text style={styles.sectionTitle}>Custom Colors</Text>
       <View style={styles.colorRow}>
@@ -595,6 +618,26 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginBottom: 10,
     fontStyle: 'italic',
+  },
+  opacityRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  opacityItem: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  opacityLabel: {
+    color: '#a0a0a0',
+    fontSize: 12,
+    marginBottom: 8,
+  },
+  opacityBox: {
+    width: 100,
+    height: 60,
+    backgroundColor: '#2d2d44',
+    borderRadius: 10,
   },
   footer: {
     height: 50,
